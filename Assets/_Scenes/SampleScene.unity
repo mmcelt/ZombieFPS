@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 412239496}
   - component: {fileID: 412239495}
   - component: {fileID: 412239494}
+  - component: {fileID: 412239499}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -155,7 +156,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &412239495
 CapsuleCollider:
@@ -232,6 +233,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &412239499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412239493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba62b7d4ff1ca54899c1f1f3ac8e20b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 0.1
+  _jumpForce: 300
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

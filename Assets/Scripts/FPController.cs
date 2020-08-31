@@ -7,6 +7,10 @@ public class FPController : MonoBehaviour
 	#region Fields
 
 	[SerializeField] float _speed = 0.1f;
+	[SerializeField] float _jumpForce = 300f;
+
+	Rigidbody _theRB;
+	CapsuleCollider _capsule;
 
 	#endregion
 
@@ -14,12 +18,14 @@ public class FPController : MonoBehaviour
 
 	void Start() 
 	{
-		
+		_theRB = GetComponent<Rigidbody>();
+		_capsule = GetComponent<CapsuleCollider>();
 	}
 	
 	void Update() 
 	{
-		
+		if (Input.GetKeyDown("space") && IsGrounded())
+			_theRB.AddForce(0f, _jumpForce, 0f);
 	}
 
 	void FixedUpdate()
@@ -38,6 +44,15 @@ public class FPController : MonoBehaviour
 
 	#region Private Methods
 
+	bool IsGrounded()
+	{
+		RaycastHit hitInfo;
 
+		if(Physics.SphereCast(transform.position,_capsule.radius,Vector3.down,out hitInfo, (_capsule.height / 2) - _capsule.radius + 0.1f))
+		{
+			return true;
+		}
+		return false;
+	}
 	#endregion
 }
