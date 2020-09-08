@@ -18,6 +18,8 @@ public class FPController : MonoBehaviour
 
 	Quaternion _cameraRot, _characterRot;
 
+	bool _cursorIsLocked = true, _lockCursor = true;
+
 	#endregion
 
 	#region MonoBehaviour Methods
@@ -32,7 +34,7 @@ public class FPController : MonoBehaviour
 	
 	void Update() 
 	{
-		if (Input.GetKeyDown("space") && IsGrounded())
+		if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
 			_theRB.AddForce(0f, _jumpForce, 0f);
 	}
 
@@ -53,12 +55,47 @@ public class FPController : MonoBehaviour
 		float z = Input.GetAxis("Vertical") * _moveSpeed;
 
 		transform.position += _theCam.transform.forward * z + _theCam.transform.right * x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
+
+		UpdateCursorLock();
 	}
 	#endregion
 
 	#region Public Methods
 
+	public void SetCursorLock(bool value)
+	{
+		_lockCursor = value;
+		if (!_lockCursor)
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		}
+	}
 
+	public void UpdateCursorLock()
+	{
+		if (_lockCursor)
+			InternalLockUpdate();
+	}
+
+	public void InternalLockUpdate()
+	{
+		if (Input.GetKeyUp(KeyCode.Escape))
+			_cursorIsLocked = false;
+		else if (Input.GetMouseButtonUp(0))
+			_cursorIsLocked = true;
+
+		if (_cursorIsLocked)
+		{
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
+		}
+		else if (!_cursorIsLocked)
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		}
+	}
 	#endregion
 
 	#region Private Methods
