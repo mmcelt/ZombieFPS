@@ -9,6 +9,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] float _moveSpeed = 0.1f;
 	[SerializeField] float _jumpForce = 300f;
 	[SerializeField] float _mouseXSensitivity, _mouseYSensitivity;
+	[SerializeField] float _minX = -80, _maxX = 80;
 
 	[SerializeField] GameObject _theCam;
 
@@ -43,13 +44,15 @@ public class FPController : MonoBehaviour
 		_cameraRot *= Quaternion.Euler(-xRot, 0, 0);
 		_characterRot *= Quaternion.Euler(0, yRot, 0);
 
+		_cameraRot = ClampRotationAroundXAxis(_cameraRot);
+
 		transform.localRotation = _characterRot;
 		_theCam.transform.localRotation = _cameraRot;
 
-		float x = Input.GetAxis("Horizontal");
-		float z = Input.GetAxis("Vertical");
+		float x = Input.GetAxis("Horizontal") * _moveSpeed;
+		float z = Input.GetAxis("Vertical") * _moveSpeed;
 
-		transform.position += new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
+		transform.position += _theCam.transform.forward * z + _theCam.transform.right * x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
 	}
 	#endregion
 
@@ -64,11 +67,28 @@ public class FPController : MonoBehaviour
 	{
 		RaycastHit hitInfo;
 
-		if(Physics.SphereCast(transform.position,_capsule.radius,Vector3.down,out hitInfo, (_capsule.height / 2) - _capsule.radius + 0.1f))
+		if(Physics.SphereCast(transform.position,_capsule.radius, Vector3.down, out hitInfo, (_capsule.height / 2) - _capsule.radius + 0.1f))
 		{
 			return true;
 		}
 		return false;
+	}
+
+	Quaternion ClampRotationAroundXAxis(Quaternion q)
+	{
+		//convert Quaternion to Euler angle
+		q.x /= q.w;
+		q.y /= q.w;
+		q.z /= q.w;
+		q.w = 1.0f;
+		float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan(q.x);
+
+		angleX = Mathf.Clamp(angleX, _minX, _maxX);
+
+		//convert Euler back to Quaternion
+		q.x = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleX);
+
+		return q;
 	}
 	#endregion
 }
