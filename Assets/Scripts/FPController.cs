@@ -6,11 +6,16 @@ public class FPController : MonoBehaviour
 {
 	#region Fields
 
-	[SerializeField] float _speed = 0.1f;
+	[SerializeField] float _moveSpeed = 0.1f;
 	[SerializeField] float _jumpForce = 300f;
+	[SerializeField] float _mouseXSensitivity, _mouseYSensitivity;
+
+	[SerializeField] GameObject _theCam;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
+
+	Quaternion _cameraRot, _characterRot;
 
 	#endregion
 
@@ -20,6 +25,8 @@ public class FPController : MonoBehaviour
 	{
 		_theRB = GetComponent<Rigidbody>();
 		_capsule = GetComponent<CapsuleCollider>();
+		_cameraRot = _theCam.transform.localRotation;
+		_characterRot = transform.localRotation;
 	}
 	
 	void Update() 
@@ -30,10 +37,19 @@ public class FPController : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		float yRot = Input.GetAxis("Mouse X") * _mouseXSensitivity;
+		float xRot = Input.GetAxis("Mouse Y") * _mouseYSensitivity;
+
+		_cameraRot *= Quaternion.Euler(-xRot, 0, 0);
+		_characterRot *= Quaternion.Euler(0, yRot, 0);
+
+		transform.localRotation = _characterRot;
+		_theCam.transform.localRotation = _cameraRot;
+
 		float x = Input.GetAxis("Horizontal");
 		float z = Input.GetAxis("Vertical");
 
-		transform.position += new Vector3(x * _speed, 0f, z * _speed);
+		transform.position += new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
 	}
 	#endregion
 
