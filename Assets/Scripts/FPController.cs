@@ -12,6 +12,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] float _minX = -80, _maxX = 80;
 
 	[SerializeField] GameObject _theCam;
+	[SerializeField] Animator _theAnim;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -36,6 +37,14 @@ public class FPController : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
 			_theRB.AddForce(0f, _jumpForce, 0f);
+
+		if (Input.GetKeyDown(KeyCode.F))
+			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
+
+		if (Input.GetMouseButtonDown(0))
+			_theAnim.SetBool("fire", true);
+		else if (Input.GetMouseButtonUp(0))
+			_theAnim.SetBool("fire", false);
 	}
 
 	void FixedUpdate()

@@ -253,6 +253,7 @@ MonoBehaviour:
   _minX: -80
   _maxX: 80
   _theCam: {fileID: 963194225}
+  _theAnim: {fileID: 1018640987}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
