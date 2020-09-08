@@ -20,6 +20,7 @@ public class FPController : MonoBehaviour
 	Quaternion _cameraRot, _characterRot;
 
 	bool _cursorIsLocked = true, _lockCursor = true;
+	float _x, _z;
 
 	#endregion
 
@@ -41,11 +42,19 @@ public class FPController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
 
-		if (Input.GetMouseButtonDown(0))
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm"))
 			_theAnim.SetTrigger("fire");
 
 		if (Input.GetKeyDown(KeyCode.R))
 			_theAnim.SetTrigger("reload");
+
+		if (_x != 0 || _z != 0)
+		{
+			if(!_theAnim.GetBool("walking"))
+				_theAnim.SetBool("walking", true);
+		}
+		else if(_theAnim.GetBool("walking"))
+			_theAnim.SetBool("walking", false);
 	}
 
 	void FixedUpdate()
@@ -61,10 +70,10 @@ public class FPController : MonoBehaviour
 		transform.localRotation = _characterRot;
 		_theCam.transform.localRotation = _cameraRot;
 
-		float x = Input.GetAxis("Horizontal") * _moveSpeed;
-		float z = Input.GetAxis("Vertical") * _moveSpeed;
+		_x = Input.GetAxis("Horizontal") * _moveSpeed;
+		_z = Input.GetAxis("Vertical") * _moveSpeed;
 
-		transform.position += _theCam.transform.forward * z + _theCam.transform.right * x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
+		transform.position += _theCam.transform.forward * _z + _theCam.transform.right * _x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
 
 		UpdateCursorLock();
 	}
