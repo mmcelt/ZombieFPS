@@ -13,6 +13,7 @@ public class FPController : MonoBehaviour
 
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
+	//[SerializeField] AudioSource _shot;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -21,6 +22,8 @@ public class FPController : MonoBehaviour
 
 	bool _cursorIsLocked = true, _lockCursor = true;
 	float _x, _z;
+
+	public bool _shotFired;
 
 	#endregion
 
@@ -42,8 +45,12 @@ public class FPController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
 
-		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm"))
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired)
+		{
 			_theAnim.SetTrigger("fire");
+			_shotFired = true;
+			//_shot.Play();
+		}
 
 		if (Input.GetKeyDown(KeyCode.R))
 			_theAnim.SetTrigger("reload");
