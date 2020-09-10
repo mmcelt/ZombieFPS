@@ -13,7 +13,8 @@ public class FPController : MonoBehaviour
 
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
-	//[SerializeField] AudioSource _shot;
+	[SerializeField] AudioSource[] _footsteps;
+	[SerializeField] AudioSource _jumping;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -40,7 +41,10 @@ public class FPController : MonoBehaviour
 	void Update() 
 	{
 		if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+		{
 			_theRB.AddForce(0f, _jumpForce, 0f);
+			_jumping.Play();
+		}
 
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
@@ -57,11 +61,17 @@ public class FPController : MonoBehaviour
 
 		if (_x != 0 || _z != 0)
 		{
-			if(!_theAnim.GetBool("walking"))
+			if (!_theAnim.GetBool("walking"))
+			{
 				_theAnim.SetBool("walking", true);
+				InvokeRepeating("PlayFootstepAudio", 0, 0.4f);
+			}
 		}
-		else if(_theAnim.GetBool("walking"))
+		else if (_theAnim.GetBool("walking"))
+		{
 			_theAnim.SetBool("walking", false);
+			CancelInvoke("PlayFootstepAudio");
+		}
 	}
 
 	void FixedUpdate()
@@ -152,6 +162,16 @@ public class FPController : MonoBehaviour
 		q.x = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleX);
 
 		return q;
+	}
+
+	void PlayFootstepAudio()
+	{
+		AudioSource audioSource = new AudioSource();
+		int n = Random.Range(1, _footsteps.Length);
+		audioSource = _footsteps[n];
+		audioSource.Play();
+		_footsteps[n] = _footsteps[0];
+		_footsteps[0] = audioSource;
 	}
 	#endregion
 }
