@@ -14,7 +14,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
 	[SerializeField] AudioSource[] _footsteps;
-	[SerializeField] AudioSource _jumping;
+	[SerializeField] AudioSource _jumping, _landing;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -44,6 +44,8 @@ public class FPController : MonoBehaviour
 		{
 			_theRB.AddForce(0f, _jumpForce, 0f);
 			_jumping.Play();
+			if(_theAnim.GetBool("walking"))
+				CancelInvoke("PlayFootstepAudio");
 		}
 
 		if (Input.GetKeyDown(KeyCode.F))
@@ -65,6 +67,7 @@ public class FPController : MonoBehaviour
 			{
 				_theAnim.SetBool("walking", true);
 				InvokeRepeating("PlayFootstepAudio", 0, 0.4f);
+
 			}
 		}
 		else if (_theAnim.GetBool("walking"))
@@ -93,6 +96,16 @@ public class FPController : MonoBehaviour
 		transform.position += _theCam.transform.forward * _z + _theCam.transform.right * _x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
 
 		UpdateCursorLock();
+	}
+
+	void OnCollisionEnter(Collision other)
+	{
+		if (IsGrounded())
+		{
+			_landing.Play();
+			if(_theAnim.GetBool("walking"))
+				InvokeRepeating("PlayFootstepAudio", 0, 0.4f);
+		}
 	}
 	#endregion
 
