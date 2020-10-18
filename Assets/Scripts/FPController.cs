@@ -26,6 +26,14 @@ public class FPController : MonoBehaviour
 
 	public bool _shotFired;
 
+	[Header("Inventory")]
+	int _ammo;
+	[SerializeField] int _maxAmmo = 50;
+
+	[Header("Health")]
+	[SerializeField] int _maxHealth = 100;
+	int _currentHealth;
+
 	#endregion
 
 	#region MonoBehaviour Methods
@@ -36,6 +44,7 @@ public class FPController : MonoBehaviour
 		_capsule = GetComponent<CapsuleCollider>();
 		_cameraRot = _theCam.transform.localRotation;
 		_characterRot = transform.localRotation;
+		_currentHealth = _maxHealth;
 	}
 	
 	void Update() 
@@ -51,11 +60,14 @@ public class FPController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
 
-		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired)
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo > 0)
 		{
 			_theAnim.SetTrigger("fire");
 			_shotFired = true;
 			//_shot.Play();
+			_ammo = Mathf.Clamp(_ammo - 1, 0, _maxAmmo);
+
+			Debug.Log("ammo: " + _ammo);
 		}
 
 		if (Input.GetKeyDown(KeyCode.R))
@@ -100,15 +112,23 @@ public class FPController : MonoBehaviour
 
 	void OnCollisionEnter(Collision other)
 	{
-		if (other.gameObject.CompareTag("Ammo"))
+		if (other.gameObject.CompareTag("Ammo") && _ammo < _maxAmmo)
 		{
+			_ammo = Mathf.Clamp(_ammo + 10, 0, _maxAmmo);
+
+			Debug.Log("Ammo: " + _ammo);
+
 			_ammoPickup.Play();
 			Destroy(other.gameObject);
 		}
-		else if (other.gameObject.CompareTag("MedKit"))
+		else if (other.gameObject.CompareTag("MedKit") && _currentHealth < _maxHealth)
 		{
+			_currentHealth = Mathf.Clamp(_currentHealth + 20, 0, _maxHealth);
+
+			Debug.Log("Health: " + _currentHealth);
+
 			_healthPickup.Play();
-			Destroy(other.gameObject, 0.2f);
+			Destroy(other.gameObject);
 		}
 		else if (IsGrounded())
 		{
