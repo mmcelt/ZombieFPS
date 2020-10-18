@@ -14,7 +14,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
 	[SerializeField] AudioSource[] _footsteps;
-	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup, _emptyChamber;
+	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup, _emptyChamber, _hurt, _death;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -66,12 +66,12 @@ public class FPController : MonoBehaviour
 			_shotFired = true;
 			//_shot.Play();
 			_ammo--;
-		}
-		else if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo <= 0)
-			_emptyChamber.Play();
 
-		Debug.Log("ammo left: " + _ammo);
-		
+			Debug.Log("ammo left: " + _ammo);
+		}
+
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo <= 0)
+			_emptyChamber.Play();
 
 		if (Input.GetKeyDown(KeyCode.R))
 			_theAnim.SetTrigger("reload");
@@ -132,6 +132,19 @@ public class FPController : MonoBehaviour
 
 			_healthPickup.Play();
 			Destroy(other.gameObject);
+		}
+		else if (other.gameObject.CompareTag("Lava"))
+		{
+			_currentHealth = Mathf.Clamp(_currentHealth -= 40, 0, _maxHealth);
+			_hurt.Play();
+
+			Debug.Log("Health: " + _currentHealth);
+
+			if (_currentHealth == 0)
+			{
+				Debug.Log("YOU DIED!");
+				_death.Play();
+			}
 		}
 		else if (IsGrounded())
 		{
