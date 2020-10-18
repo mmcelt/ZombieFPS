@@ -14,7 +14,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
 	[SerializeField] AudioSource[] _footsteps;
-	[SerializeField] AudioSource _jumping, _landing;
+	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -93,14 +93,24 @@ public class FPController : MonoBehaviour
 		_x = Input.GetAxis("Horizontal") * _moveSpeed;
 		_z = Input.GetAxis("Vertical") * _moveSpeed;
 
-		transform.position += _theCam.transform.forward * _z + _theCam.transform.right * _x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
+		transform.position += transform.forward * _z + _theCam.transform.right * _x;//new Vector3(x * _moveSpeed, 0f, z * _moveSpeed);
 
 		UpdateCursorLock();
 	}
 
 	void OnCollisionEnter(Collision other)
 	{
-		if (IsGrounded())
+		if (other.gameObject.CompareTag("Ammo"))
+		{
+			_ammoPickup.Play();
+			Destroy(other.gameObject);
+		}
+		else if (other.gameObject.CompareTag("MedKit"))
+		{
+			_healthPickup.Play();
+			Destroy(other.gameObject, 0.2f);
+		}
+		else if (IsGrounded())
 		{
 			_landing.Play();
 			if(_theAnim.GetBool("walking"))

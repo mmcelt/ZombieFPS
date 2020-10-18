@@ -17,11 +17,6 @@ public class SoundController : MonoBehaviour
 	{
 		
 	}
-	
-	void Update() 
-	{
-		
-	}
 	#endregion
 
 	#region Public Methods
