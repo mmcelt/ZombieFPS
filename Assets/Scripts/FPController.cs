@@ -14,7 +14,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
 	[SerializeField] AudioSource[] _footsteps;
-	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup;
+	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup, _emptyChamber;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -65,10 +65,13 @@ public class FPController : MonoBehaviour
 			_theAnim.SetTrigger("fire");
 			_shotFired = true;
 			//_shot.Play();
-			_ammo = Mathf.Clamp(_ammo - 1, 0, _maxAmmo);
-
-			Debug.Log("ammo: " + _ammo);
+			_ammo--;
 		}
+		else if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo <= 0)
+			_emptyChamber.Play();
+
+		Debug.Log("ammo left: " + _ammo);
+		
 
 		if (Input.GetKeyDown(KeyCode.R))
 			_theAnim.SetTrigger("reload");
