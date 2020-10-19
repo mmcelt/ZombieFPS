@@ -14,7 +14,7 @@ public class FPController : MonoBehaviour
 	[SerializeField] GameObject _theCam;
 	[SerializeField] Animator _theAnim;
 	[SerializeField] AudioSource[] _footsteps;
-	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup, _emptyChamber, _hurt, _death;
+	[SerializeField] AudioSource _jumping, _landing, _ammoPickup, _healthPickup, _emptyChamber, _hurt, _death, _reload;
 
 	Rigidbody _theRB;
 	CapsuleCollider _capsule;
@@ -29,6 +29,8 @@ public class FPController : MonoBehaviour
 	[Header("Inventory")]
 	int _ammo;
 	[SerializeField] int _maxAmmo = 50;
+	int _ammoClip;
+	[SerializeField] int _maxAmmoClip = 10;
 
 	[Header("Health")]
 	[SerializeField] int _maxHealth = 100;
@@ -60,21 +62,34 @@ public class FPController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
 
-		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo > 0)
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammoClip > 0)
 		{
 			_theAnim.SetTrigger("fire");
 			_shotFired = true;
 			//_shot.Play();
-			_ammo--;
+			_ammoClip--;
 
-			Debug.Log("ammo left: " + _ammo);
+			Debug.Log("Ammo available: " + _ammo);
+			Debug.Log("Ammo in clip: " + _ammoClip);
 		}
 
-		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammo <= 0)
+		if (Input.GetMouseButtonDown(0) && _theAnim.GetBool("arm") && !_shotFired && _ammoClip <= 0)
 			_emptyChamber.Play();
 
-		if (Input.GetKeyDown(KeyCode.R))
+		if (Input.GetKeyDown(KeyCode.R) && _theAnim.GetBool("arm"))
+		{
 			_theAnim.SetTrigger("reload");
+
+			int ammoNeededToFillClip = _maxAmmoClip - _ammoClip;
+			int ammoAvailable = ammoNeededToFillClip < _ammo ? ammoNeededToFillClip : _ammo; //could use Mathf.Min(ammoNeededToFillClip, _ammo) instead
+			_ammo -= ammoAvailable;
+			_ammoClip += ammoAvailable;
+
+			Debug.Log("Ammo Left: " + _ammo);
+			Debug.Log("Ammo in clip: " + _ammoClip);
+
+			_reload.Play();
+		}
 
 		if (_x != 0 || _z != 0)
 		{
@@ -117,7 +132,7 @@ public class FPController : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Ammo") && _ammo < _maxAmmo)
 		{
-			_ammo = Mathf.Clamp(_ammo + 10, 0, _maxAmmo);
+			_ammo = Mathf.Clamp(_ammo + 20, 0, _maxAmmo);
 
 			Debug.Log("Ammo: " + _ammo);
 
@@ -126,7 +141,7 @@ public class FPController : MonoBehaviour
 		}
 		else if (other.gameObject.CompareTag("MedKit") && _currentHealth < _maxHealth)
 		{
-			_currentHealth = Mathf.Clamp(_currentHealth + 20, 0, _maxHealth);
+			_currentHealth = Mathf.Clamp(_currentHealth + 10, 0, _maxHealth);
 
 			Debug.Log("Health: " + _currentHealth);
 
