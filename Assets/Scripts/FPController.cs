@@ -24,6 +24,8 @@ public class FPController : MonoBehaviour
 	bool _cursorIsLocked = true, _lockCursor = true;
 	float _x, _z;
 
+	bool _playingWalking, _previouslyGrounded = true;
+
 	public bool _shotFired;
 
 	[Header("Inventory")]
@@ -51,14 +53,6 @@ public class FPController : MonoBehaviour
 	
 	void Update() 
 	{
-		if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
-		{
-			_theRB.AddForce(0f, _jumpForce, 0f);
-			_jumping.Play();
-			if(_theAnim.GetBool("walking"))
-				CancelInvoke("PlayFootstepAudio");
-		}
-
 		if (Input.GetKeyDown(KeyCode.F))
 			_theAnim.SetBool("arm", !_theAnim.GetBool("arm"));
 
@@ -104,7 +98,26 @@ public class FPController : MonoBehaviour
 		{
 			_theAnim.SetBool("walking", false);
 			CancelInvoke("PlayFootstepAudio");
+			_playingWalking = false;
 		}
+
+		bool grounded = IsGrounded();
+		if (Input.GetKeyDown(KeyCode.Space) && grounded)
+		{
+			_theRB.AddForce(0f, _jumpForce, 0f);
+			_jumping.Play();
+			if (_theAnim.GetBool("walking"))
+			{
+				CancelInvoke("PlayFootstepAudio");
+				_playingWalking = false;
+			}
+		}
+		else if(!_previouslyGrounded && grounded)
+		{
+			_landing.Play();
+		}
+
+		_previouslyGrounded = grounded;
 	}
 
 	void FixedUpdate()
@@ -163,9 +176,10 @@ public class FPController : MonoBehaviour
 		}
 		else if (IsGrounded())
 		{
-			_landing.Play();
-			if(_theAnim.GetBool("walking"))
+			if(_theAnim.GetBool("walking") && !_playingWalking)
+			{
 				InvokeRepeating("PlayFootstepAudio", 0, 0.4f);
+			}
 		}
 	}
 	#endregion
@@ -246,6 +260,7 @@ public class FPController : MonoBehaviour
 		audioSource.Play();
 		_footsteps[n] = _footsteps[0];
 		_footsteps[0] = audioSource;
+		_playingWalking = true;
 	}
 	#endregion
 }
